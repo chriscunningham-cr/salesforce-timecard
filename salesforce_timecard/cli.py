@@ -28,7 +28,9 @@ def process_row(ctx, project, notes, hours, weekday, w, file):
     assignment_id = None
     active_assignment = te.get_assignments_active()
     for _, assign in active_assignment.items():
-        if project.lower() in assign["assignment_name"].lower() and len(project) > 2:
+        if project.lower() in assign[
+            "assignment_name"
+        ].lower() and len(project) > 2:
             logger.info("found :{}".format(assign["assignment_name"]))
             assignment_id = assign["assignment_id"]
             break
@@ -40,7 +42,9 @@ def process_row(ctx, project, notes, hours, weekday, w, file):
         # fetch global project
         global_project = te.global_project
         for _, prj in global_project.items():
-            if project.lower() in prj["project_name"].lower() and len(project) > 4:
+            if project.lower() in prj[
+                "project_name"
+            ].lower() and len(project) > 4:
                 logger.info("found " + prj["project_name"])
                 assignment_id = prj["project_id"]
                 break
@@ -92,8 +96,9 @@ def catch_exceptions(func):
             return func(*args, **kwargs)
         except KeyboardInterrupt:
             click.echo(" bye bye")
-        except:
+        except Exception as e:
             if len(str(sys.exc_info()[1])) > 0:
+                print(e)
                 logger.error(sys.exc_info()[1])
                 sys.exit(1)
 
@@ -104,11 +109,20 @@ def catch_exceptions(func):
 @click.version_option(prog_name=__description__, version=__version__)
 @click.option("-v", "--verbose", is_flag=True, help="verbose")
 @click.option(
-    "-s", "--startday", default=te.start.strftime("%Y-%m-%d"), help="Start day")
+    "-s", "--startday",
+    default=te.start.strftime("%Y-%m-%d"),
+    help="Start day"
+)
 @click.option(
-    "-e", "--endday", default=te.end.strftime("%Y-%m-%d"), help="End day")
+    "-e", "--endday",
+    default=te.end.strftime("%Y-%m-%d"),
+    help="End day"
+)
 @click.option(
-    "--week", default="", help="relative week interval e.g.: -1")
+    "--week",
+    default="",
+    help="relative week interval e.g.: -1"
+)
 @click.pass_context
 def cli(ctx, verbose, startday, endday, week):  # pragma: no cover
 
@@ -124,7 +138,8 @@ def cli(ctx, verbose, startday, endday, week):  # pragma: no cover
     if week != "":
         day = date.today().strftime("%Y-%m-%d")
         dt = datetime.strptime(day, "%Y-%m-%d")
-        _startday = dt - timedelta(days=dt.weekday()) + timedelta(weeks=int(week))
+        _startday = dt - timedelta(
+            days=dt.weekday()) + timedelta(weeks=int(week))
         _endday = _startday + timedelta(days=6)
         startday = _startday.strftime("%Y-%m-%d")
         endday = _endday.strftime("%Y-%m-%d")
@@ -139,7 +154,7 @@ def cli(ctx, verbose, startday, endday, week):  # pragma: no cover
     }
 
 
-@cli.command(name="delete",aliases=["d", "del", "rm", "remove"])
+@cli.command(name="delete", aliases=["d", "del", "rm", "remove"])
 @click.argument("timecard", required=False)
 @click.pass_context
 @catch_exceptions
@@ -179,24 +194,30 @@ def delete(ctx, timecard):
 
 @cli.command(name="submit", aliases=["s", "send"])
 @click.option(
-    "-f", "--force", default=False, is_flag=True, help="confirm all question")
-
+    "-f", "--force",
+    default=False,
+    is_flag=True,
+    help="confirm all question"
+)
 @click.pass_context
 @catch_exceptions
 def submit(ctx, force):
     rs = te.list_timecard(False, ctx.obj["startday"], ctx.obj["endday"])
     tc_ids = []
     for timecard_rs in rs:
-        click.echo("{} - {}".format(timecard_rs["Name"],
-                                    timecard_rs.get(
-                                            "pse__Project_Name__c", "")
-                                        )
-                )
+        click.echo("{} - {}".format(
+            timecard_rs["Name"],
+            timecard_rs.get("pse__Project_Name__c", "")
+        ))
         tc_ids.append(timecard_rs)
 
-    if force == False:
-            click.confirm("Do you want to submit all timecard ?", default=True, abort=True)
-            click.echo()
+    if force is False:
+        click.confirm(
+            "Do you want to submit all timecard ?",
+            default=True,
+            abort=True
+        )
+        click.echo()
 
     for tc in tc_ids:
         te.submit_time_entry(tc["Id"])
@@ -207,7 +228,10 @@ def submit(ctx, force):
 @click.option("--details/--no-details", default=False)
 @click.option(
     "--style",
-    type=click.Choice(["plain", "simple", "github", "grid", "fancy_grid", "pipe", "orgtbl", "jira", "presto", "json"]),
+    type=click.Choice([
+        "plain", "simple", "github", "grid", "fancy_grid",
+        "pipe", "orgtbl", "jira", "presto", "json"
+    ]),
     default="grid",
     help="table style")
 @click.pass_context
@@ -218,8 +242,9 @@ def list(ctx, details, style):
         click.echo(json.dumps(rs, indent=4))
     else:
         hc = HoursCounter(rs)
-        click.echo(tabulate(hc.report, headers="keys", tablefmt=style, stralign="center", ))
-
+        click.echo(tabulate(
+            hc.report, headers="keys", tablefmt=style, stralign="center"
+        ))
 
 
 @cli.command(name="add", aliases=["a", "ad"])
