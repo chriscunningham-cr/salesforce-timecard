@@ -57,7 +57,7 @@ class TimecardEntry(object):
         try:
             return self.sf.query_all(sql)
         except Exception as e:
-            print(e)
+            logger.error(e)
             logger.error("error on query:{}".format(sql))
             logger.error(sys.exc_info()[1])
             sys.exit(1)
@@ -202,7 +202,7 @@ class TimecardEntry(object):
         try:
             self.sf.pse__Timecard_Header__c.delete(id)
         except Exception as e:
-            print(e)
+            logger.error(e)
             logger.error("failed on deletion id:{}".format(id))
             logger.error(sys.exc_info()[1])
             sys.exit(1)
@@ -270,7 +270,7 @@ class TimecardEntry(object):
                     results["records"][0]["Id"], new_timecard
                 )
             except Exception as e:
-                print(e)
+                logger.error(e)
                 logger.error("failed on update")
                 logger.error(sys.exc_info()[1])
                 sys.exit(1)
@@ -279,7 +279,7 @@ class TimecardEntry(object):
             try:
                 self.sf.pse__Timecard_Header__c.create(new_timecard)
             except Exception as e:
-                print(e)
+                logger.error(e)
                 logger.error("failed on creation")
                 logger.error(sys.exc_info()[1])
                 sys.exit(1)
@@ -293,7 +293,7 @@ class TimecardEntry(object):
         try:
             self.sf.pse__Timecard_Header__c.update(id, data)
         except Exception as e:
-            print(e)
+            logger.error(e)
             logger.error("failed on update")
             logger.error(sys.exc_info()[1])
             sys.exit(1)

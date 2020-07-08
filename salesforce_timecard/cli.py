@@ -98,7 +98,7 @@ def catch_exceptions(func):
             click.echo(" bye bye")
         except Exception as e:
             if len(str(sys.exc_info()[1])) > 0:
-                print(e)
+                logger.error(e)
                 logger.error(sys.exc_info()[1])
                 sys.exit(1)
 
