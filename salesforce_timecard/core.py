@@ -34,7 +34,7 @@ class TimecardEntry(object):
             username=self.cfg["username"],
             password=password,
             security_token=security_token,
-            sandbox=self.cfg.get("sandbox", None),
+            # sandbox=self.cfg.get("sandbox", None),
             client_id="FF"
         )
 
